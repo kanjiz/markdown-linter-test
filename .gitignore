@@ -1,0 +1,8 @@
+# JetBrains IDE 固有の設定ファイル
+.idea
+
+# Visual Studio Code 固有の設定ファイル
+.vscode
+
+# macOS 固有のファイル
+.DS_Store
