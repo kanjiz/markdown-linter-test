@@ -17,20 +17,36 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2
       - name: Install Chromium
-        run: sudo apt-get install -y chromium-browser
+        id: setup-chrome
+        uses: browser-actions/setup-chrome@latest
+        with:
+          chrome-version: stable
       - name: Install Marp CLI
         run: npm install -g @marp-team/marp-cli
       - name: Convert Markdown to PDF
+        env:
+          CHROME_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
         run: |
+          echo "Chrome path: $CHROME_PATH"
           for file in $(find . -name "*.md"); do
             if grep -q "marp: true" "$file"; then
               output_file="${file%.md}.pdf"
-              marp --pdf "$file" -o "$output_file"
+              marp --pdf --chrome "$CHROME_PATH" "$file" -o "$output_file" --allow-local-files
               echo "Converted $file to $output_file"
             fi
           done
+
+      - name: Check PDF files
+        run: |
+          find . -name "*.pdf" -type f -print
+
       - name: Upload PDFs
+        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: pdf-slides
