@@ -11,6 +11,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      UDEV_GOTHIC_URL: https://github.com/yuru7/udev-gothic/releases/download/v2.0.0/UDEVGothic_v2.0.0.zip
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
@@ -21,6 +23,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2
+      - name: Install UDEV Gothic font
+        run: |
+          wget $UDEV_GOTHIC_URL -O /tmp/UDEVGothic.zip
+          unzip /tmp/UDEVGothic.zip -d /tmp/UDEVGothic
+          sudo mkdir -p /usr/share/fonts/truetype/udev-gothic
+          sudo cp /tmp/UDEVGothic/*.ttf /usr/share/fonts/truetype/udev-gothic/
+          sudo fc-cache -fv
       - name: Install Chromium
         id: setup-chrome
         uses: browser-actions/setup-chrome@latest
