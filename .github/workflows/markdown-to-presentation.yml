@@ -12,11 +12,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      UDEV_GOTHIC_URL: https://github.com/yuru7/udev-gothic/releases/download/v2.0.0/UDEVGothic_v2.0.0.zip
-
     steps:
       - uses: actions/checkout@v4
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: /usr/share/fonts/truetype/udev-gothic
+          key: ${{ runner.os }}-udev-gothic-v2.0.0
+          restore-keys: |
+            ${{ runner.os }}-udev-gothic-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -26,17 +30,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libnss3 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 unzip poppler-utils
       - name: Install UDEV Gothic font
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          wget $UDEV_GOTHIC_URL -O /tmp/UDEVGothic.zip
+          wget https://github.com/yuru7/udev-gothic/releases/download/v2.0.0/UDEVGothic_v2.0.0.zip -O /tmp/UDEVGothic.zip
           unzip /tmp/UDEVGothic.zip -d /tmp/UDEVGothic
+          FONT_DIR=$(find /tmp/UDEVGothic -type d -name "UDEVGothic_v*")
           sudo mkdir -p /usr/share/fonts/truetype/udev-gothic
-          sudo cp /tmp/UDEVGothic/UDEVGothic_v2.0.0/*.ttf /usr/share/fonts/truetype/udev-gothic/
+          sudo cp $FONT_DIR/*.ttf /usr/share/fonts/truetype/udev-gothic/
           sudo fc-cache -fv
-      - name: Install Chromium
-        id: setup-chrome
-        uses: browser-actions/setup-chrome@latest
-        with:
-          chrome-version: stable
       - name: Install Marp CLI
         run: npm install -g @marp-team/marp-cli
       - name: Convert Markdown to PDF
@@ -44,7 +45,7 @@ jobs:
           for file in $(find . -name "*.md"); do
             if grep -q "marp: true" "$file"; then
               output_file="${file%.md}.pdf"
-              marp --pdf --chrome-path=$(which google-chrome) --css custom.css "$file" -o "$output_file"
+              marp --pdf --css custom.css "$file" -o "$output_file" --allow-local-files
               echo "Converted $file to $output_file"
             fi
           done
