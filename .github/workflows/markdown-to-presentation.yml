@@ -49,6 +49,12 @@ jobs:
               echo "Converted $file to $output_file"
             fi
           done
+      - name: Check PDF fonts
+        run: |
+          for pdf in $(find . -name "*.pdf"); do
+            echo "Fonts in $pdf:"
+            pdffonts "$pdf"
+          done
       - name: Check PDF files
         run: |
           find . -name "*.pdf" -type f -print
