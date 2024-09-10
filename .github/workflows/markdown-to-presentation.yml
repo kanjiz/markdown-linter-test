@@ -22,13 +22,13 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2
+          sudo apt-get install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2 unzip
       - name: Install UDEV Gothic font
         run: |
           wget $UDEV_GOTHIC_URL -O /tmp/UDEVGothic.zip
           unzip /tmp/UDEVGothic.zip -d /tmp/UDEVGothic
           sudo mkdir -p /usr/share/fonts/truetype/udev-gothic
-          sudo cp /tmp/UDEVGothic/*.ttf /usr/share/fonts/truetype/udev-gothic/
+          sudo cp /tmp/UDEVGothic/UDEVGothic_v2.0.0/*.ttf /usr/share/fonts/truetype/udev-gothic/
           sudo fc-cache -fv
       - name: Install Chromium
         id: setup-chrome
@@ -49,11 +49,9 @@ jobs:
               echo "Converted $file to $output_file"
             fi
           done
-
       - name: Check PDF files
         run: |
           find . -name "*.pdf" -type f -print
-
       - name: Upload PDFs
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
