@@ -29,10 +29,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Cache Node.js modules
+        id: cache-node-modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y poppler-utils
+          npm ci
       - name: Install UDEV Gothic font
         if: steps.cache-udev-gothic.outputs.cache-hit != 'true'
         run: |
