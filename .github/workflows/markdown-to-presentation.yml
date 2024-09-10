@@ -45,7 +45,7 @@ jobs:
           for file in $(find . -name "*.md"); do
             if grep -q "marp: true" "$file"; then
               output_file="${file%.md}.pdf"
-              marp --pdf --chrome "$CHROME_PATH" "$file" -o "$output_file" --allow-local-files
+              marp --pdf --chrome "$CHROME_PATH" --css custom.css "$file" -o "$output_file" --allow-local-files
               echo "Converted $file to $output_file"
             fi
           done

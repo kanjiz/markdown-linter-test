@@ -1,0 +1,9 @@
+/* custom.css */
+@font-face {
+  font-family: 'UDEV Gothic';
+  src: url('file:///usr/share/fonts/truetype/udev-gothic/UDEVGothic35-Regular.ttf') format('truetype');
+}
+
+body {
+  font-family: 'UDEV Gothic', sans-serif;
+}
