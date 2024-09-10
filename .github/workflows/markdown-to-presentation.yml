@@ -11,8 +11,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     env:
       UDEV_GOTHIC_URL: https://github.com/yuru7/udev-gothic/releases/download/v2.0.0/UDEVGothic_v2.0.0.zip
+
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
@@ -22,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2 unzip poppler-utils
+          sudo apt-get install -y libnss3 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 unzip poppler-utils
       - name: Install UDEV Gothic font
         run: |
           wget $UDEV_GOTHIC_URL -O /tmp/UDEVGothic.zip
@@ -38,22 +40,13 @@ jobs:
       - name: Install Marp CLI
         run: npm install -g @marp-team/marp-cli
       - name: Convert Markdown to PDF
-        env:
-          CHROME_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
         run: |
-          echo "Chrome path: $CHROME_PATH"
           for file in $(find . -name "*.md"); do
             if grep -q "marp: true" "$file"; then
               output_file="${file%.md}.pdf"
-              marp --pdf --chrome "$CHROME_PATH" --css custom.css "$file" -o "$output_file" --allow-local-files
+              marp --pdf --chrome-path=$(which google-chrome) --css custom.css "$file" -o "$output_file"
               echo "Converted $file to $output_file"
             fi
-          done
-      - name: Check PDF fonts
-        run: |
-          for pdf in $(find . -name "*.pdf"); do
-            echo "Fonts in $pdf:"
-            pdffonts "$pdf"
           done
       - name: Check PDF files
         run: |
