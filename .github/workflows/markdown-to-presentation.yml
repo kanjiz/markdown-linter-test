@@ -14,7 +14,6 @@ jobs:
 
     env:
       UDEV_GOTHIC_URL: https://github.com/yuru7/udev-gothic/releases/download/v2.0.0/UDEVGothic_v2.0.0.zip
-      VERSION: null
 
     steps:
       - uses: actions/checkout@v4
@@ -48,3 +47,23 @@ jobs:
         uses: browser-actions/setup-chrome@latest
         with:
           chrome-version: stable
+      - name: Install Marp CLI
+        run: npm install -g @marp-team/marp-cli
+      - name: Convert Markdown to PDF
+        run: |
+          for file in $(find . -name "*.md"); do
+            if grep -q "marp: true" "$file"; then
+              output_file="${file%.md}.pdf"
+              marp --pdf --allow-local-files --chrome-path=$(which google-chrome) --css custom.css "$file" -o "$output_file"
+              echo "Converted $file to $output_file"
+            fi
+          done
+      - name: Check PDF files
+        run: |
+          find . -name "*.pdf" -type f -print
+      - name: Upload PDFs
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdf-slides
+          path: '**/*.pdf'
