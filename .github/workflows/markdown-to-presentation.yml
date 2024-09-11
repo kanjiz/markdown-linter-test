@@ -22,7 +22,6 @@ jobs:
         id: extract-version
         run: |
           VERSION=$(echo $UDEV_GOTHIC_URL | grep -oP 'v[0-9]+\.[0-9]+\.[0-9]+')
-          echo "VERSION=$VERSION"
           echo "VERSION=<<EOF" >> $GITHUB_ENV
           echo $VERSION >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
