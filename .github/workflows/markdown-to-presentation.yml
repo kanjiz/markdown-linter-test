@@ -14,7 +14,7 @@ jobs:
 
     env:
       UDEV_GOTHIC_URL: https://github.com/yuru7/udev-gothic/releases/download/v2.0.0/UDEVGothic_v2.0.0.zip
-      VERSION: ''
+      VERSION: null
 
     steps:
       - uses: actions/checkout@v4
