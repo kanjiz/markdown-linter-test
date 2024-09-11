@@ -20,15 +20,14 @@ jobs:
       - name: Extract UDEV Gothic version
         id: extract-version
         run: |
-          VERSION=$(echo $UDEV_GOTHIC_URL | grep -oP 'v[0-9]+\.[0-9]+\.[0-9]+')
-          echo $VERSION
+          VERSION=$(echo $UDEV_GOTHIC_URL | grep -oP 'v[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
       - name: Cache UDEV Gothic font
         id: cache-udev-gothic
         uses: actions/cache@v4
         with:
           path: /usr/share/fonts/truetype/udev-gothic
-          key: ${{ runner.os }}-udev-gothic-${{ steps.extract-version.outputs.VERSION }}
+          key: ${{ runner.os }}-udev-gothic-${{ env.VERSION }}
           restore-keys: |
             ${{ runner.os }}-udev-gothic-
       - name: Setup Node.js
